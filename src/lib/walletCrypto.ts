@@ -15,7 +15,7 @@ async function deriveKey(password: string, salt: Uint8Array, usage: KeyUsage): P
     "raw", enc.encode(password), "PBKDF2", false, ["deriveKey"]
   );
   return crypto.subtle.deriveKey(
-    { name: "PBKDF2", salt, iterations: 200_000, hash: "SHA-256" },
+    { name: "PBKDF2", salt: new Uint8Array(salt), iterations: 200_000, hash: "SHA-256" },
     keyMaterial,
     { name: "AES-GCM", length: 256 },
     false,
@@ -61,7 +61,7 @@ export async function decryptSeedPhrase(backup: WalletBackup, password: string):
   const ciphertext = fromBase64(backup.ciphertext);
   const key = await deriveKey(password, salt, "decrypt");
 
-  const plaintext = await crypto.subtle.decrypt({ name: "AES-GCM", iv }, key, ciphertext);
+  const plaintext = await crypto.subtle.decrypt({ name: "AES-GCM", iv: new Uint8Array(iv) }, key, new Uint8Array(ciphertext));
   return dec.decode(plaintext).split(" ");
 }
 
