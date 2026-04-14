@@ -12,6 +12,7 @@ export const mockTeams: Team[] = [
     description: "Elite rugby club based in Nairobi, competing in national championships",
     coach: "Coach James Kipchoge",
     established: 2015,
+    walletAddress: "addr_test1qp5s2x5kg6h7jx8nm9p0qrs2t1v4w3x7y9z2a1b5c4d3e6f8g2h4j7k9",
     milestones: [
       {
         id: "m-1",
@@ -45,6 +46,7 @@ export const mockTeams: Team[] = [
     description: "Coastal rugby powerhouse with a strong youth development program",
     coach: "Coach Samuel Ouma",
     established: 2018,
+    walletAddress: "addr_test1qpzmr7n2wf8da4yjhk6vxl9q5t3m0nkr2phs8cg7b4e6d3wl0ajkx",
     milestones: [
       {
         id: "m-3",
@@ -69,6 +71,7 @@ export const mockTeams: Team[] = [
     description: "Up-and-coming team with incredible talent from western Kenya",
     coach: "Coach Peter Kiplagat",
     established: 2019,
+    walletAddress: "addr_test1qpfkm9r3xs4h8na7wq5d6elp2v0t9mb3nyc7dj8e5f6g4h2ij1klm",
     milestones: [],
   },
   {
@@ -82,6 +85,7 @@ export const mockTeams: Team[] = [
     description: "Rift Valley rugby club known for their aggressive playing style",
     coach: "Coach David Kipchoge",
     established: 2016,
+    walletAddress: "addr_test1qpgh8t4vy3k2n9lr6s7emp5w1x8nca4pbmd9fk7g8h1i2j3kl4mnop",
     milestones: [
       {
         id: "m-4",
@@ -105,6 +109,7 @@ export const mockTeams: Team[] = [
     description: "Championship-winning team with a history of excellence",
     coach: "Coach Henry Kosgei",
     established: 2014,
+    walletAddress: "addr_test1qpij9u5wz4l3o0ms7t8fnq6r2y9odbe5qcne0gl8h9i1j2k3lm5nopq",
     milestones: [
       {
         id: "m-5",
@@ -128,6 +133,7 @@ export const mockTeams: Team[] = [
     description: "Community-based rugby initiative supporting underprivileged youth",
     coach: "Coach John Musyoka",
     established: 2020,
+    walletAddress: "addr_test1qpjk0v6xa5m4p1nt8u9gor7s3z0pecf6rdo1hm9i0j1k2l3mn6opqr",
     milestones: [],
   },
   {
@@ -141,6 +147,7 @@ export const mockTeams: Team[] = [
     description: "Emerging talent hub in western Kenya with great potential",
     coach: "Coach Francis Kipchoge",
     established: 2021,
+    walletAddress: "addr_test1qpkl1w7yb6n5q2ou9v0hps8t4a1qfdg7sep2in0j1k2l3mn7opqrs",
     milestones: [],
   },
   {
@@ -154,6 +161,7 @@ export const mockTeams: Team[] = [
     description: "Northern region rugby team breaking ground in new territory",
     coach: "Coach Mohamed Hassan",
     established: 2022,
+    walletAddress: "addr_test1qplm2x8zc7o6r3pv0w1iqt9u5b2rge8tfq3jo1k2l3mn8opqrst",
     milestones: [],
   },
   {
@@ -167,6 +175,7 @@ export const mockTeams: Team[] = [
     description: "Coastal youth rugby program with focus on talent development",
     coach: "Coach Amina Khalid",
     established: 2019,
+    walletAddress: "addr_test1qpmn3y9ad8p7s4qw1x2jru0v6c3shf9ugr4kp2l3mn9opqrstu",
     milestones: [
       {
         id: "m-6",
@@ -190,6 +199,7 @@ export const mockTeams: Team[] = [
     description: "Remote area rugby initiative promoting sport in underserved regions",
     coach: "Coach Abdi Ibrahim",
     established: 2023,
+    walletAddress: "addr_test1qpno4z0be9q8t5rx2y3ksv1w7d4tih0vhs5lq3mn0opqrstuv",
     milestones: [],
   },
 ];
@@ -254,8 +264,10 @@ export const mockTransactions: Transaction[] = [
     amount: 500,
     type: "donation",
     teamId: "team-1",
+    teamName: "Nairobi Warriors",
     timestamp: "2025-11-24T10:30:00Z",
     txHash: "8a2c9e7f4b1d6e3a5c9b2d8f7e1a4c6b",
+    donorNote: "Keep up the great work!",
   },
   {
     id: "tx-2",
@@ -263,6 +275,7 @@ export const mockTransactions: Transaction[] = [
     amount: 1000,
     type: "donation",
     teamId: "team-1",
+    teamName: "Nairobi Warriors",
     timestamp: "2025-11-23T14:15:00Z",
     txHash: "9b3d0f8g5c2e7f4a6d0c3e9f8b2a5d7c",
   },
@@ -272,6 +285,7 @@ export const mockTransactions: Transaction[] = [
     amount: 750,
     type: "payout",
     teamId: "team-2",
+    teamName: "Mombasa Titans",
     timestamp: "2025-11-22T09:45:00Z",
     txHash: "7a1b8c9d0e2f3a4b5c6d7e8f9a0b1c2d",
   },
@@ -281,6 +295,7 @@ export const mockTransactions: Transaction[] = [
     amount: 300,
     type: "engagement",
     teamId: "team-1",
+    teamName: "Nairobi Warriors",
     timestamp: "2025-11-21T16:20:00Z",
     txHash: "5c0a7b8c9d1e2f3a4b5c6d7e8f9a0b1c",
   },
@@ -290,8 +305,10 @@ export const mockTransactions: Transaction[] = [
     amount: 600,
     type: "donation",
     teamId: "team-3",
+    teamName: "Kisumu Rhinos",
     timestamp: "2025-11-20T11:00:00Z",
     txHash: "6d1b8c9e0f2a3b4c5d6e7f8a9b0c1d2e",
+    donorNote: "From the diaspora with love",
   },
 ];
 

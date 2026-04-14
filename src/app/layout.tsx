@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { Providers } from "@/providers/Providers";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -15,8 +16,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "RugbyFundX - Transparent Sports Crowdfunding",
-  description: "On-chain crowdfunding platform providing transparent fund tracking, milestone-based fund release, and active sponsor-player engagement for Kenyan rugby",
+  title: "RugbyFundX - Transparent Sports Crowdfunding on Cardano",
+  description:
+    "On-chain crowdfunding platform providing transparent fund tracking, milestone-based fund release, and active sponsor-player engagement for Kenyan rugby",
 };
 
 export default function RootLayout({
@@ -29,9 +31,11 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#fdfffc]`}
       >
-        <Header />
-        {children}
-        <Footer />
+        <Providers>
+          <Header />
+          {children}
+          <Footer />
+        </Providers>
       </body>
     </html>
   );
