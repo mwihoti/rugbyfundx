@@ -6,8 +6,8 @@ import { WalletModal } from "@/components/WalletModal";
 import { TeamCard } from "@/components/TeamCard";
 import { Team, Transaction, CommunityMetrics } from "@/types";
 import Link from "next/link";
+import { getCardanoscanTxUrl, getNetworkLabel } from "@/lib/cardanoExplorer";
 
-const CARDANOSCAN = "https://preprod.cardanoscan.io/transaction/";
 const TYPE_COLORS: Record<string, string> = {
   donation: "bg-green-100 text-green-800",
   payout: "bg-blue-100 text-blue-800",
@@ -48,7 +48,7 @@ export default function Home() {
           <div className="max-w-3xl">
             <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-1.5 text-sm font-medium text-green-100 mb-6 border border-white/20">
               <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-              Live on Cardano Preprod Testnet
+              Live on Cardano {getNetworkLabel()}
             </div>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold mb-6 leading-tight">
               Transparent Funding for Kenyan Rugby
@@ -247,7 +247,7 @@ export default function Home() {
                           </td>
                           <td className="px-6 py-3.5">
                             <a
-                              href={`${CARDANOSCAN}${tx.txHash}`}
+                              href={getCardanoscanTxUrl(tx.txHash)}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="text-xs text-[#065f46] font-mono hover:underline"

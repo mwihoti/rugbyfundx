@@ -13,6 +13,14 @@ const PASSKEY =
   process.env.MPESA_PASSKEY ??
   "bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919";
 
+type PaymentStatus = "confirmed" | "failed" | "pending";
+
+interface DarajaQueryStatus {
+  status: PaymentStatus;
+  resultCode?: string;
+  resultDesc?: string;
+}
+
 function getTimestamp(): string {
   const now = new Date();
   return [
@@ -25,10 +33,10 @@ function getTimestamp(): string {
   ].join("");
 }
 
-async function queryDaraja(checkoutRequestId: string): Promise<"confirmed" | "failed" | "pending"> {
+async function queryDaraja(checkoutRequestId: string): Promise<DarajaQueryStatus> {
   const key = process.env.MPESA_CONSUMER_KEY;
   const secret = process.env.MPESA_CONSUMER_SECRET;
-  if (!key || !secret) return "pending";
+  if (!key || !secret) return { status: "pending" };
 
   try {
     const credentials = Buffer.from(`${key}:${secret}`).toString("base64");
@@ -36,7 +44,7 @@ async function queryDaraja(checkoutRequestId: string): Promise<"confirmed" | "fa
       `${DARAJA_BASE}/oauth/v1/generate?grant_type=client_credentials`,
       { headers: { Authorization: `Basic ${credentials}` } }
     );
-    if (!tokenRes.ok) return "pending";
+    if (!tokenRes.ok) return { status: "pending", resultDesc: `Daraja auth failed: ${tokenRes.status}` };
     const { access_token } = await tokenRes.json() as { access_token: string };
 
     const timestamp = getTimestamp();
@@ -53,15 +61,27 @@ async function queryDaraja(checkoutRequestId: string): Promise<"confirmed" | "fa
       }),
     });
 
-    if (!queryRes.ok) return "pending";
-    const data = await queryRes.json() as { ResultCode?: string | number };
+    if (!queryRes.ok) return { status: "pending", resultDesc: `Daraja query failed: ${queryRes.status}` };
+    const data = await queryRes.json() as {
+      ResultCode?: string | number;
+      ResultDesc?: string;
+      errorCode?: string;
+      errorMessage?: string;
+    };
     const code = String(data.ResultCode ?? "");
-    if (code === "0") return "confirmed";
-    if (code === "1032") return "failed"; // cancelled by user
-    if (code === "1037") return "pending"; // still pending/timeout
-    return code ? "failed" : "pending";
+    const resultDesc = data.ResultDesc ?? data.errorMessage;
+    if (code === "0") return { status: "confirmed", resultCode: code, resultDesc: resultDesc ?? "Payment confirmed" };
+
+    // These are terminal STK states. Unknown responses are left pending so the
+    // callback still has a chance to settle the request instead of racing it.
+    const terminalFailures = new Set(["1", "1019", "1032", "1036", "1037", "2001"]);
+    if (terminalFailures.has(code)) {
+      return { status: "failed", resultCode: code, resultDesc: resultDesc ?? "M-Pesa payment failed" };
+    }
+
+    return { status: "pending", resultCode: code || data.errorCode, resultDesc };
   } catch {
-    return "pending";
+    return { status: "pending" };
   }
 }
 
@@ -108,6 +128,8 @@ function confirmEntry(
 
   pending[checkoutRequestId].status = "confirmed";
   if (mpesaRef) pending[checkoutRequestId].mpesaRef = mpesaRef;
+  pending[checkoutRequestId].resultCode = "0";
+  pending[checkoutRequestId].resultDesc = "Payment confirmed";
   writeStore("mpesa-pending.json", pending);
 }
 
@@ -123,10 +145,15 @@ export async function GET(
     return NextResponse.json({ status: "not_found" }, { status: 404 });
   }
 
-  // If still pending and real credentials available, query Daraja directly as fallback
-  if (entry.status === "pending" && !checkoutRequestId.startsWith("dev-")) {
+  // Query Daraja while pending. Also re-check legacy failed rows that do not
+  // have a result code, because older code collapsed unknown responses to failed.
+  const shouldQueryDaraja =
+    !checkoutRequestId.startsWith("dev-") &&
+    (entry.status === "pending" || (entry.status === "failed" && !entry.resultCode));
+
+  if (shouldQueryDaraja) {
     const darajaStatus = await queryDaraja(checkoutRequestId);
-    if (darajaStatus === "confirmed") {
+    if (darajaStatus.status === "confirmed") {
       confirmEntry(pending, entry, checkoutRequestId);
       return NextResponse.json({
         status: "confirmed",
@@ -134,10 +161,17 @@ export async function GET(
         adaEquivalent: entry.adaEquivalent,
         kshAmount: entry.kshAmount,
         teamName: entry.teamName,
+        resultCode: darajaStatus.resultCode,
+        resultDesc: darajaStatus.resultDesc,
       });
-    } else if (darajaStatus === "failed") {
+    } else if (darajaStatus.status === "failed") {
       pending[checkoutRequestId].status = "failed";
+      pending[checkoutRequestId].resultCode = darajaStatus.resultCode;
+      pending[checkoutRequestId].resultDesc = darajaStatus.resultDesc;
       writeStore("mpesa-pending.json", pending);
+      entry.status = "failed";
+      entry.resultCode = darajaStatus.resultCode;
+      entry.resultDesc = darajaStatus.resultDesc;
     }
   }
 
@@ -147,12 +181,14 @@ export async function GET(
     adaEquivalent: entry.adaEquivalent,
     kshAmount: entry.kshAmount,
     teamName: entry.teamName,
+    resultCode: entry.resultCode,
+    resultDesc: entry.resultDesc,
   });
 }
 
 // Dev-only: manually confirm a pending payment (simulates Daraja callback)
 export async function POST(
-  _req: Request,
+  req: Request,
   { params }: { params: Promise<{ checkoutRequestId: string }> }
 ) {
   if (process.env.NODE_ENV === "production") {
@@ -164,11 +200,17 @@ export async function POST(
   const entry = pending[checkoutRequestId];
 
   if (!entry) return NextResponse.json({ error: "Not found" }, { status: 404 });
-  if (entry.status !== "pending") {
+  if (entry.status !== "pending" && !(entry.status === "failed" && !entry.resultCode)) {
     return NextResponse.json({ error: `Already ${entry.status}` }, { status: 400 });
   }
 
-  const fakeRef = `SIM${Date.now().toString().slice(-8)}`;
+  let mpesaRef = `SIM${Date.now().toString().slice(-8)}`;
+  try {
+    const body = await req.json() as { mpesaRef?: string };
+    if (body.mpesaRef?.trim()) mpesaRef = body.mpesaRef.trim().toUpperCase();
+  } catch {
+    // Body is optional; no-op when absent.
+  }
 
   const transactions = readStore<Transaction[]>("transactions.json", []);
   const newTx: Transaction = {
@@ -183,7 +225,7 @@ export async function POST(
     teamId: entry.teamId,
     teamName: entry.teamName,
     timestamp: new Date().toISOString(),
-    txHash: fakeRef,
+    txHash: mpesaRef,
     donorNote: entry.donorNote,
     donorPhone: entry.donorPhone,
     status: "confirmed",
@@ -206,8 +248,10 @@ export async function POST(
   writeStore("metrics.json", metrics);
 
   pending[checkoutRequestId].status = "confirmed";
-  pending[checkoutRequestId].mpesaRef = fakeRef;
+  pending[checkoutRequestId].mpesaRef = mpesaRef;
+  pending[checkoutRequestId].resultCode = "0";
+  pending[checkoutRequestId].resultDesc = "Dev payment confirmed";
   writeStore("mpesa-pending.json", pending);
 
-  return NextResponse.json({ status: "confirmed", mpesaRef: fakeRef, adaEquivalent: entry.adaEquivalent });
+  return NextResponse.json({ status: "confirmed", mpesaRef, adaEquivalent: entry.adaEquivalent });
 }

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { AssistanceRequestForm } from "@/components/AssistanceRequestForm";
 import { Transaction, AssistanceRequest } from "@/types";
 import Link from "next/link";
+import { getCardanoscanTxUrl } from "@/lib/cardanoExplorer";
 
 const TYPE_COLORS: Record<string, string> = {
   donation: "bg-green-100 text-green-800",
@@ -163,7 +164,7 @@ export default function DashboardPage() {
                           </td>
                           <td className="px-6 py-4">
                             <a
-                              href={`https://preprod.cardanoscan.io/transaction/${tx.txHash}`}
+                              href={getCardanoscanTxUrl(tx.txHash)}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="text-xs text-[#065f46] font-mono hover:underline"

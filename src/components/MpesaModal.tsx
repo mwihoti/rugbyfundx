@@ -61,7 +61,12 @@ export function MpesaModal({ isOpen, onClose, team, onSuccess }: MpesaModalProps
 
       try {
         const res = await fetch(`/api/mpesa/status/${checkoutRequestId}`);
-        const data = await res.json() as { status: string; mpesaRef?: string; adaEquivalent?: number };
+        const data = await res.json() as {
+          status: string;
+          mpesaRef?: string;
+          adaEquivalent?: number;
+          resultDesc?: string;
+        };
 
         if (data.status === "confirmed") {
           clearInterval(pollRef.current!);
@@ -71,7 +76,7 @@ export function MpesaModal({ isOpen, onClose, team, onSuccess }: MpesaModalProps
           onSuccess(parsedKsh, data.adaEquivalent ?? adaEquivalent, data.mpesaRef ?? "");
         } else if (data.status === "failed") {
           clearInterval(pollRef.current!);
-          setError("Payment was cancelled or failed. Please try again.");
+          setError(data.resultDesc ?? "Payment was cancelled or failed. Please try again.");
           setStep("error");
         }
       } catch {

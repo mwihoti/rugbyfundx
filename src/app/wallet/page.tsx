@@ -2,9 +2,11 @@
 
 import { useState, useCallback, useEffect } from "react";
 import QRCode from "react-qr-code";
+import Link from "next/link";
 import { useWalletContext } from "@/context/WalletContext";
 import { WalletModal } from "@/components/WalletModal";
 import { encryptSeedPhrase, downloadBackupFile } from "@/lib/walletCrypto";
+import { getNetworkLabel } from "@/lib/cardanoExplorer";
 
 const STORAGE_KEY = "rfx_selfcustodial_wallet";
 const BACKUP_KEY = "rfx_wallet_backed_up";
@@ -135,7 +137,7 @@ export default function WalletPage() {
                     <p className="font-bold text-gray-900">{walletName}</p>
                     <div className="flex items-center gap-2">
                       <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                      <span className="text-xs text-green-700 font-medium">Connected · Preprod Testnet</span>
+                      <span className="text-xs text-green-700 font-medium">Connected · {getNetworkLabel()}</span>
                     </div>
                   </div>
                 </div>
@@ -181,7 +183,7 @@ export default function WalletPage() {
                 <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-4">
                   <p className="text-sm font-semibold text-amber-800 mb-1">Get Testnet ADA</p>
                   <p className="text-xs text-amber-700 mb-2">
-                    This wallet is on Cardano Preprod testnet. Get free test ADA from the faucet:
+                    This wallet is on Cardano {getNetworkLabel()}. Get free test ADA from the faucet:
                   </p>
                   <a
                     href="https://docs.cardano.org/cardano-testnets/tools/faucet"
@@ -241,14 +243,14 @@ export default function WalletPage() {
                     <h3 className="font-bold text-gray-900 group-hover:text-[#065f46] transition">Receive ADA</h3>
                     <p className="text-sm text-gray-500 mt-1">Show QR code for your address</p>
                   </button>
-                  <a
+                  <Link
                     href="/teams"
                     className="bg-white rounded-2xl border-2 border-green-100 p-5 hover:border-[#065f46] transition group shadow-sm block"
                   >
                     <div className="text-3xl mb-3">🏉</div>
                     <h3 className="font-bold text-gray-900 group-hover:text-[#065f46] transition">Donate to a Team</h3>
                     <p className="text-sm text-gray-500 mt-1">Browse all teams and send ADA</p>
-                  </a>
+                  </Link>
                 </div>
 
                 <div className="bg-gray-50 rounded-2xl border border-gray-200 p-6">
@@ -306,7 +308,7 @@ export default function WalletPage() {
                     </button>
 
                     <p className="text-xs text-gray-400 text-center">
-                      This wallet is on Cardano Preprod Testnet — only testnet ADA can be received here.
+                      This wallet is on Cardano {getNetworkLabel()} — only testnet ADA can be received here.
                     </p>
                   </div>
                 )}
@@ -469,7 +471,7 @@ export default function WalletPage() {
             </button>
 
             <p className="text-xs text-gray-400 mt-4">
-              Operating on Cardano Preprod Testnet
+              Operating on Cardano {getNetworkLabel()}
             </p>
           </div>
         )}

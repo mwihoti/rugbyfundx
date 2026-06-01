@@ -9,6 +9,8 @@ const NETWORK = process.env.NEXT_PUBLIC_NETWORK ?? "preprod";
 const KOIOS_BASE =
   NETWORK === "mainnet"
     ? "https://api.koios.rest/api/v1"
+    : NETWORK === "preview"
+      ? "https://preview.koios.rest/api/v1"
     : "https://preprod.koios.rest/api/v1";
 
 async function proxy(req: NextRequest, path: string[]): Promise<NextResponse> {

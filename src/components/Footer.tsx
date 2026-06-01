@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getCardanoscanBaseUrl, getNetworkLabel } from "@/lib/cardanoExplorer";
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
@@ -18,7 +19,7 @@ export function Footer() {
               Transparent on-chain crowdfunding for Kenyan rugby on Cardano
             </p>
             <div className="text-xs bg-green-50 text-green-800 border border-green-200 rounded-lg px-2.5 py-1.5 inline-block">
-              Cardano Preprod Testnet
+              Cardano {getNetworkLabel()}
             </div>
           </div>
 
@@ -47,7 +48,7 @@ export function Footer() {
             <ul className="space-y-2 text-sm">
               <li>
                 <a
-                  href="https://preprod.cardanoscan.io"
+                  href={getCardanoscanBaseUrl()}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-gray-600 hover:text-[#065f46] transition"

@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 300" role="img" aria-labelledby="title desc">
+  <title id="title">Rugby scrum</title>
+  <desc id="desc">A stylized rugby scrum on a green field.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#064e3b"/>
+      <stop offset="1" stop-color="#0ea5e9"/>
+    </linearGradient>
+  </defs>
+  <rect width="500" height="300" fill="url(#bg)"/>
+  <path d="M0 205c89-30 164-36 225-18 73 22 164 16 275-18v131H0z" fill="#15803d"/>
+  <g fill="none" stroke="#dcfce7" stroke-opacity=".65" stroke-width="3">
+    <path d="M0 238h500M46 200h408"/>
+  </g>
+  <g transform="translate(96 92)">
+    <g fill="#f8fafc">
+      <circle cx="44" cy="54" r="18"/><circle cx="92" cy="48" r="18"/><circle cx="140" cy="55" r="18"/>
+      <circle cx="188" cy="49" r="18"/><circle cx="236" cy="55" r="18"/><circle cx="284" cy="49" r="18"/>
+    </g>
+    <g fill="#065f46">
+      <path d="M20 76h54l20 72H0z"/><path d="M69 71h54l19 77H47z"/><path d="M116 77h54l20 71H96z"/>
+      <path d="M163 71h54l20 77h-94z"/><path d="M211 77h54l20 71h-94z"/><path d="M260 71h54l19 77h-94z"/>
+    </g>
+    <g stroke="#f97316" stroke-width="5" stroke-linecap="round">
+      <path d="M26 101h64M118 103h61M207 103h65"/>
+    </g>
+  </g>
+</svg>

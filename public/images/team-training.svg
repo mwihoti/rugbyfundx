@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 300" role="img" aria-labelledby="title desc">
+  <title id="title">Rugby training</title>
+  <desc id="desc">Training cones, a ball, and field markings on a rugby pitch.</desc>
+  <defs>
+    <linearGradient id="field" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#22c55e"/>
+      <stop offset="1" stop-color="#0f766e"/>
+    </linearGradient>
+  </defs>
+  <rect width="500" height="300" fill="#e0f2fe"/>
+  <rect y="70" width="500" height="230" fill="url(#field)"/>
+  <g stroke="#ecfdf5" stroke-opacity=".8" stroke-width="4" fill="none">
+    <path d="M0 132h500M0 214h500M132 70v230M368 70v230"/>
+    <circle cx="250" cy="174" r="54"/>
+  </g>
+  <g fill="#f97316">
+    <path d="M100 222l20-55 20 55z"/><rect x="95" y="221" width="50" height="9" rx="4"/>
+    <path d="M345 235l22-61 22 61z"/><rect x="339" y="234" width="56" height="10" rx="5"/>
+    <path d="M230 244l18-49 18 49z"/><rect x="226" y="243" width="44" height="8" rx="4"/>
+  </g>
+  <ellipse cx="284" cy="143" rx="44" ry="23" fill="#78350f" transform="rotate(16 284 143)"/>
+  <path d="M246 134c26 20 55 28 86 23" fill="none" stroke="#fed7aa" stroke-width="4" stroke-linecap="round"/>
+  <path d="M284 121l-4 43" stroke="#fed7aa" stroke-width="3" stroke-linecap="round"/>
+</svg>

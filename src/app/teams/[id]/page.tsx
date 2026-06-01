@@ -3,15 +3,17 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Team } from "@/types";
+import { Team, Transaction } from "@/types";
 import { DonationModal } from "@/components/DonationModal";
 import { MpesaModal } from "@/components/MpesaModal";
 import { WalletModal } from "@/components/WalletModal";
 import { useWalletContext } from "@/context/WalletContext";
+import { getCardanoscanTxUrl } from "@/lib/cardanoExplorer";
 
 export default function TeamDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const [team, setTeam] = useState<Team | null>(null);
   const [loading, setLoading] = useState(true);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [donateOpen, setDonateOpen] = useState(false);
   const [mpesaOpen, setMpesaOpen] = useState(false);
   const [walletOpen, setWalletOpen] = useState(false);
@@ -20,12 +22,25 @@ export default function TeamDetailPage({ params }: { params: Promise<{ id: strin
 
   useEffect(() => {
     params.then(({ id }) => {
-      fetch(`/api/teams/${id}`)
-        .then((r) => r.json())
-        .then((data) => { setTeam(data); setLoading(false); })
+      Promise.all([
+        fetch(`/api/teams/${id}`).then((r) => r.json()),
+        fetch(`/api/transactions?teamId=${id}`).then((r) => r.json()),
+      ])
+        .then(([teamData, txData]) => {
+          setTeam(teamData);
+          setTransactions(txData);
+          setLoading(false);
+        })
         .catch(() => setLoading(false));
     });
   }, [params]);
+
+  const refreshTransactions = (teamId: string) => {
+    fetch(`/api/transactions?teamId=${teamId}`)
+      .then((r) => r.json())
+      .then(setTransactions)
+      .catch(() => undefined);
+  };
 
   const showToast = (msg: string, type: "success" | "error") => {
     setToast({ msg, type });
@@ -36,6 +51,7 @@ export default function TeamDetailPage({ params }: { params: Promise<{ id: strin
     setTeam((prev) =>
       prev ? { ...prev, totalRaised: prev.totalRaised + amount } : prev
     );
+    if (team) refreshTransactions(team.id);
     showToast(`Donated ${amount} ADA! Tx: ${txHash.slice(0, 12)}...`, "success");
   };
 
@@ -43,6 +59,7 @@ export default function TeamDetailPage({ params }: { params: Promise<{ id: strin
     setTeam((prev) =>
       prev ? { ...prev, totalRaised: prev.totalRaised + adaEquivalent } : prev
     );
+    if (team) refreshTransactions(team.id);
     showToast(`M-Pesa donation received! KSH ${kshAmount.toLocaleString()} (≈ ${adaEquivalent} ADA) · Ref: ${mpesaRef}`, "success");
   };
 
@@ -68,6 +85,13 @@ export default function TeamDetailPage({ params }: { params: Promise<{ id: strin
 
   const fundingPct = Math.min((team.totalRaised / team.targetAmount) * 100, 100);
   const completedMilestones = team.milestones.filter((m) => m.completed).length;
+  const formatDate = (iso: string) =>
+    new Date(iso).toLocaleDateString("en-KE", {
+      day: "numeric",
+      month: "short",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
 
   return (
     <main>
@@ -178,6 +202,70 @@ export default function TeamDetailPage({ params }: { params: Promise<{ id: strin
                       )}
                     </div>
                   ))}
+                </div>
+              )}
+            </div>
+
+            <div className="mt-8">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-bold text-gray-900">Recent Transactions</h2>
+                <Link href={`/transparency`} className="text-sm font-semibold text-[#065f46] hover:text-[#10b981]">
+                  View all →
+                </Link>
+              </div>
+
+              {transactions.length === 0 ? (
+                <div className="bg-gray-50 rounded-2xl border border-gray-200 p-6 text-center text-gray-500">
+                  No transactions recorded for this team yet.
+                </div>
+              ) : (
+                <div className="bg-white rounded-2xl border border-green-100 shadow-sm overflow-hidden">
+                  <div className="divide-y divide-gray-50">
+                    {transactions.slice(0, 5).map((tx) => (
+                      <div key={tx.id} className="p-4 flex flex-col sm:flex-row sm:items-center gap-3 justify-between">
+                        <div>
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className={`text-xs font-semibold px-2.5 py-1 rounded-full capitalize ${
+                              tx.type === "mpesa"
+                                ? "bg-emerald-100 text-emerald-800"
+                                : "bg-green-100 text-green-800"
+                            }`}>
+                              {tx.type === "mpesa" ? "M-Pesa" : tx.type}
+                            </span>
+                            <span className="text-xs text-gray-500">{formatDate(tx.timestamp)}</span>
+                          </div>
+                          <div className="font-bold text-gray-900">
+                            {tx.type === "mpesa" && tx.kshAmount ? (
+                              <>
+                                KSH {tx.kshAmount.toLocaleString()}
+                                <span className="text-sm font-medium text-gray-500"> ≈ {(tx.adaEquivalent ?? tx.amount).toLocaleString()} ADA</span>
+                              </>
+                            ) : (
+                              <>{tx.amount.toLocaleString()} ADA</>
+                            )}
+                          </div>
+                          {tx.donorNote && (
+                            <p className="text-sm text-gray-500 italic mt-1">&ldquo;{tx.donorNote}&rdquo;</p>
+                          )}
+                        </div>
+
+                        {tx.type === "mpesa" ? (
+                          <span className="text-xs font-mono text-gray-600 bg-gray-100 px-2 py-1 rounded w-fit">
+                            {tx.txHash}
+                          </span>
+                        ) : (
+                          <a
+                            href={getCardanoscanTxUrl(tx.txHash)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-xs font-mono text-[#065f46] hover:underline w-fit"
+                          >
+                            {tx.txHash.slice(0, 12)}... ↗
+                          </a>
+                        )}
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
             </div>

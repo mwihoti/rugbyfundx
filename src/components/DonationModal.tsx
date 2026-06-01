@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useWalletContext } from "@/context/WalletContext";
 import { Team } from "@/types";
+import { getCardanoscanTxUrl, getNetworkLabel } from "@/lib/cardanoExplorer";
 
 interface DonationModalProps {
   isOpen: boolean;
@@ -15,11 +16,7 @@ interface DonationModalProps {
 type Step = "amount" | "confirm" | "processing" | "success" | "error";
 
 const PLATFORM_ADDRESS = process.env.NEXT_PUBLIC_DONATION_ADDRESS ?? "";
-const NETWORK = process.env.NEXT_PUBLIC_NETWORK ?? "preprod";
-const CARDANOSCAN_BASE =
-  NETWORK === "mainnet"
-    ? "https://cardanoscan.io/transaction/"
-    : "https://preprod.cardanoscan.io/transaction/";
+const NETWORK_LABEL = getNetworkLabel();
 
 export function DonationModal({
   isOpen,
@@ -111,7 +108,7 @@ export function DonationModal({
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-lg font-bold">Donate to {team.name}</h2>
-              <p className="text-green-100 text-sm">{team.location} · Cardano {NETWORK === "mainnet" ? "Mainnet" : "Preprod Testnet"}</p>
+              <p className="text-green-100 text-sm">{team.location} · Cardano {NETWORK_LABEL}</p>
             </div>
             <button
               onClick={handleClose}
@@ -237,7 +234,7 @@ export function DonationModal({
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-500">Network</span>
-                  <span className="text-gray-700 capitalize">{NETWORK}</span>
+                  <span className="text-gray-700">{NETWORK_LABEL}</span>
                 </div>
                 {donorNote && (
                   <div className="flex justify-between">
@@ -303,7 +300,7 @@ export function DonationModal({
                 <p className="text-xs text-gray-500 mb-1 font-medium">Transaction Hash</p>
                 <p className="text-xs font-mono text-gray-700 break-all mb-2">{txHash}</p>
                 <a
-                  href={`${CARDANOSCAN_BASE}${txHash}`}
+                  href={getCardanoscanTxUrl(txHash)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-xs text-[#065f46] font-semibold hover:underline"

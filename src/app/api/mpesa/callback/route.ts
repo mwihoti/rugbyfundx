@@ -28,7 +28,7 @@ export async function POST(req: Request) {
     const cb = body.Body?.stkCallback;
     if (!cb) return NextResponse.json({ ResultCode: 0, ResultDesc: "Accepted" });
 
-    const { CheckoutRequestID, ResultCode, CallbackMetadata } = cb;
+    const { CheckoutRequestID, ResultCode, ResultDesc, CallbackMetadata } = cb;
 
     const pending = readStore<Record<string, MpesaPending>>("mpesa-pending.json", {});
     const entry = pending[CheckoutRequestID];
@@ -41,6 +41,8 @@ export async function POST(req: Request) {
     if (ResultCode !== 0) {
       // Payment failed or cancelled by user
       pending[CheckoutRequestID].status = "failed";
+      pending[CheckoutRequestID].resultCode = String(ResultCode);
+      pending[CheckoutRequestID].resultDesc = ResultDesc;
       writeStore("mpesa-pending.json", pending);
       return NextResponse.json({ ResultCode: 0, ResultDesc: "Accepted" });
     }
@@ -95,6 +97,8 @@ export async function POST(req: Request) {
     // Mark as confirmed in pending (keeps brief history before cleanup)
     pending[CheckoutRequestID].status = "confirmed";
     pending[CheckoutRequestID].mpesaRef = mpesaRef;
+    pending[CheckoutRequestID].resultCode = "0";
+    pending[CheckoutRequestID].resultDesc = "Payment confirmed";
     writeStore("mpesa-pending.json", pending);
 
     return NextResponse.json({ ResultCode: 0, ResultDesc: "Accepted" });

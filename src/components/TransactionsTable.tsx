@@ -1,4 +1,5 @@
 import { Transaction } from "@/types";
+import { getCardanoscanTxUrl } from "@/lib/cardanoExplorer";
 
 interface TransactionsTableProps {
   transactions: Transaction[];
@@ -57,7 +58,7 @@ export function TransactionsTable({ transactions, limit }: TransactionsTableProp
               <td className="px-4 py-3 text-gray-600 font-mono text-xs">{tx.walletAddress}</td>
               <td className="px-4 py-3 text-gray-600 font-mono text-xs">
                 <a
-                  href={`https://cardanoscan.io/transaction/${tx.txHash}`}
+                  href={getCardanoscanTxUrl(tx.txHash)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-[#065f46] hover:underline"

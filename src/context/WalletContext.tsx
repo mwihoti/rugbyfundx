@@ -44,6 +44,16 @@ const WalletContext = createContext<WalletContextType | null>(null);
 const NETWORK_ID = 0; // 0 = testnet (preprod), 1 = mainnet
 const STORAGE_KEY = "rfx_selfcustodial_wallet";
 
+function uniqueWallets(wallets: InstalledWallet[]): InstalledWallet[] {
+  const seen = new Set<string>();
+  return wallets.filter((wallet) => {
+    const key = `${wallet.name}:${wallet.version}:${wallet.icon}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
 // All Koios calls from the browser are proxied through /api/koios to avoid
 // CORS issues (Koios sends Access-Control-Allow-Origin only on OPTIONS,
 // not on actual POST responses).
@@ -74,7 +84,7 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
       try {
         const { BrowserWallet, MeshWallet, KoiosProvider } = await import("@meshsdk/core");
         const wallets = BrowserWallet.getInstalledWallets();
-        setInstalledWallets(wallets);
+        setInstalledWallets(uniqueWallets(wallets));
 
         // Restore self-custodial wallet from localStorage
         const stored = localStorage.getItem(STORAGE_KEY);

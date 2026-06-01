@@ -25,6 +25,8 @@ export interface MpesaPending {
   status: "pending" | "confirmed" | "failed";
   initiatedAt: string;
   mpesaRef?: string;
+  resultCode?: string;
+  resultDesc?: string;
 }
 
 async function getDarajaToken(): Promise<string> {

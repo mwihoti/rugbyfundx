@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { Transaction, CommunityMetrics, AssistanceRequest } from "@/types";
+import { getCardanoscanTxUrl } from "@/lib/cardanoExplorer";
 
-const CARDANOSCAN = "https://preprod.cardanoscan.io/transaction/";
 const TYPE_COLORS: Record<string, string> = {
   donation: "bg-green-100 text-green-800",
   payout: "bg-blue-100 text-blue-800",
@@ -233,7 +233,7 @@ export default function TransparencyPage() {
                               </span>
                             ) : (
                               <a
-                                href={`${CARDANOSCAN}${tx.txHash}`}
+                                href={getCardanoscanTxUrl(tx.txHash)}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="text-xs text-[#065f46] font-mono hover:underline"

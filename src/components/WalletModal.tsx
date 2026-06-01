@@ -3,6 +3,7 @@
 import { useState, useRef } from "react";
 import { useWalletContext } from "@/context/WalletContext";
 import { decryptSeedPhrase, WalletBackup } from "@/lib/walletCrypto";
+import { getNetworkLabel } from "@/lib/cardanoExplorer";
 
 interface WalletModalProps {
   isOpen: boolean;
@@ -168,7 +169,7 @@ export function WalletModal({ isOpen, onClose }: WalletModalProps) {
                 <p className="text-sm font-mono text-gray-600 break-all">
                   {shortAddr(address || "")}
                 </p>
-                <p className="text-xs text-gray-500 mt-1">Preprod Testnet</p>
+                <p className="text-xs text-gray-500 mt-1">{getNetworkLabel()}</p>
               </div>
               <button
                 onClick={handleDisconnect}
@@ -220,9 +221,9 @@ export function WalletModal({ isOpen, onClose }: WalletModalProps) {
                     </div>
                   ) : (
                     <div className="space-y-3">
-                      {installedWallets.map((w) => (
+                      {installedWallets.map((w, index) => (
                         <button
-                          key={w.name}
+                          key={`${w.name}-${w.version}-${index}`}
                           onClick={() => handleConnect(w.name)}
                           disabled={isLoading}
                           className="w-full flex items-center gap-3 p-3 border-2 border-gray-200 rounded-xl hover:border-[#065f46] hover:bg-green-50 transition disabled:opacity-50"
@@ -256,7 +257,7 @@ export function WalletModal({ isOpen, onClose }: WalletModalProps) {
                           <li>• You will receive a 24-word recovery phrase</li>
                           <li>• Write it down and store it safely offline</li>
                           <li>• Anyone with your phrase can access your funds</li>
-                          <li>• This wallet operates on Cardano Preprod Testnet</li>
+                          <li>• This wallet operates on Cardano {getNetworkLabel()}</li>
                         </ul>
                       </div>
                       <button
@@ -427,7 +428,7 @@ export function WalletModal({ isOpen, onClose }: WalletModalProps) {
 
           {connected && (
             <p className="text-xs text-center text-gray-400">
-              Network: Cardano Preprod Testnet · Powered by Mesh SDK
+              Network: Cardano {getNetworkLabel()} · Powered by Mesh SDK
             </p>
           )}
         </div>

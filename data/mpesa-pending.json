@@ -36,5 +36,48 @@
     "donorPhone": "2547****4034",
     "status": "failed",
     "initiatedAt": "2026-04-14T13:28:33.887Z"
+  },
+  "ws_CO_02052026172731254723559412": {
+    "checkoutRequestId": "ws_CO_02052026172731254723559412",
+    "merchantRequestId": "f652-48e2-b73c-829b0b54be651047",
+    "teamId": "team-1",
+    "teamName": "Nairobi Warriors",
+    "kshAmount": 50,
+    "adaEquivalent": 1.58,
+    "exchangeRate": 31.58,
+    "donorPhone": "2547****9412",
+    "donorNote": "enjoy",
+    "status": "failed",
+    "initiatedAt": "2026-05-02T14:27:31.586Z"
+  },
+  "ws_CO_01062026175925218769836003": {
+    "checkoutRequestId": "ws_CO_01062026175925218769836003",
+    "merchantRequestId": "af47-4ac4-bf65-22a9605b210c20441",
+    "teamId": "team-2",
+    "teamName": "Mombasa Titans",
+    "kshAmount": 10,
+    "adaEquivalent": 0.31,
+    "exchangeRate": 32.15,
+    "donorPhone": "2547****6003",
+    "status": "confirmed",
+    "initiatedAt": "2026-06-01T14:59:25.643Z",
+    "mpesaRef": "UF1GX6005F",
+    "resultCode": "0",
+    "resultDesc": "Payment confirmed from M-Pesa receipt"
+  },
+  "ws_CO_01062026180054953769836003": {
+    "checkoutRequestId": "ws_CO_01062026180054953769836003",
+    "merchantRequestId": "4413-468c-b949-a0f46ce2524314431",
+    "teamId": "team-2",
+    "teamName": "Mombasa Titans",
+    "kshAmount": 10,
+    "adaEquivalent": 0.31,
+    "exchangeRate": 32.15,
+    "donorPhone": "2547****6003",
+    "status": "confirmed",
+    "initiatedAt": "2026-06-01T15:00:55.347Z",
+    "mpesaRef": "UF1GX6006Y",
+    "resultCode": "0",
+    "resultDesc": "Payment confirmed from M-Pesa receipt"
   }
 }
